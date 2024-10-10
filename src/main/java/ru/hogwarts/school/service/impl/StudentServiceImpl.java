@@ -39,6 +39,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student updateStudent(Long studentId, Student student) {
+        student.setId(studentId);
         studentRepository.put(studentId, student);
         return student;
     }

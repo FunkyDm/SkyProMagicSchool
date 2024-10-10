@@ -40,6 +40,7 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public Faculty updateFaculty(Long facultyId, Faculty faculty) {
+        faculty.setId(facultyId);
         faculties.put(facultyId, faculty);
         return faculty;
     }
