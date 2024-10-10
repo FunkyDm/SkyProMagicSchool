@@ -1,14 +1,18 @@
 package ru.hogwarts.school.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Objects;
 
 public class Faculty {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
-    String name;
-    String color;
 
-    public Faculty(Long id, String name, String color) {
-        this.id = id;
+    private String name;
+
+    private String color;
+
+    public Faculty(String name, String color) {
         this.name = name;
         this.color = color;
     }

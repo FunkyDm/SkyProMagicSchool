@@ -8,51 +8,37 @@ import ru.hogwarts.school.service.impl.FacultyServiceImpl;
 import java.util.List;
 
 @RestController
-@RequestMapping("faculty")
+@RequestMapping("/faculty")
 public class FacultyController {
-    public final FacultyServiceImpl facultyServiceImpl;
+    private final FacultyServiceImpl facultyServiceImpl;
 
     public FacultyController(FacultyServiceImpl facultyServiceImpl) {
         this.facultyServiceImpl = facultyServiceImpl;
     }
 
-    @PostMapping
-    public ResponseEntity<Faculty> createFaculty(@RequestBody Faculty faculty) {
-        Faculty createdFaculty = facultyServiceImpl.createFaculty(faculty);
-        return ResponseEntity.ok(createdFaculty);
+    @PostMapping("/add")
+    public Faculty createFaculty(@RequestBody Faculty faculty) {
+        return facultyServiceImpl.createFaculty(faculty);
     }
 
-    @GetMapping("{facultyId}")
-    public ResponseEntity<Faculty> getFaculty(@PathVariable Long facultyId) {
-        Faculty faculty = facultyServiceImpl.getFacultyById(facultyId);
-        if (faculty == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(faculty);
+    @GetMapping("/{facultyId}/get")
+    public Faculty getFaculty(@PathVariable("facultyId") Long facultyId) {
+        return facultyServiceImpl.getFacultyById(facultyId);
     }
 
-    @PutMapping()
-    public ResponseEntity<Faculty> updateFaculty(@RequestBody Faculty faculty) {
-        Faculty updatedFaculty = facultyServiceImpl.updateFaculty(faculty.getId(), faculty);
-        if (updatedFaculty == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(updatedFaculty);
+    @PutMapping("/update")
+    public Faculty updateFaculty(@RequestBody Faculty faculty) {
+        return facultyServiceImpl.updateFaculty(faculty.getId(), faculty);
     }
 
-    @DeleteMapping("{facultyId}")
-    public ResponseEntity<Faculty> deleteFaculty(@PathVariable Long facultyId) {
-        Faculty deletedFaculty = facultyServiceImpl.deleteFaculty(facultyId);
-        if (deletedFaculty == null) {
-            return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(deletedFaculty);
+    @DeleteMapping("/{facultyId}/remove")
+    public void deleteFaculty(@PathVariable("facultyId") Long facultyId) {
+        facultyServiceImpl.deleteFaculty(facultyId);
     }
 
-    @GetMapping("{facultyColor}")
-    public ResponseEntity<List<Faculty>> filterStudentsByAge(@PathVariable String facultyColor) {
-        List<Faculty> facultyColorFilterList = facultyServiceImpl.facultyColorFilter(facultyColor);
-        return ResponseEntity.ok(facultyColorFilterList);
+    @GetMapping("/colors")
+    public List<Faculty> filterFacultiesByColor(@RequestParam String facultyColor) {
+        return facultyServiceImpl.filterFacultiesByColor(facultyColor);
     }
 
 }
