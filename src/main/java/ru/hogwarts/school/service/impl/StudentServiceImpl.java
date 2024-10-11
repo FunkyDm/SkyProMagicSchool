@@ -33,20 +33,23 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student getStudentById(Long studentId) {
-        return studentRepository.get(studentId);
+    public Student getStudentById(long id) {
+        return studentRepository.get(id);
     }
 
     @Override
-    public Student updateStudent(Long studentId, Student student) {
-        student.setId(studentId);
-        studentRepository.put(studentId, student);
+    public Student updateStudent(long id, Student student) {
+        if(!studentRepository.containsKey(id)){
+            return null;
+        }
+        student.setId(id);
+        studentRepository.put(id, student);
         return student;
     }
 
     @Override
-    public Student deleteStudent(Long studentId) {
-        return studentRepository.remove(studentId);
+    public Student deleteStudent(long id) {
+        return studentRepository.remove(id);
     }
 
     @Override

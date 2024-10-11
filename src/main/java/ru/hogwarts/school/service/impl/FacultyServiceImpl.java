@@ -34,20 +34,23 @@ public class FacultyServiceImpl implements FacultyService {
     }
 
     @Override
-    public Faculty getFacultyById(Long facultyId) {
-        return faculties.get(facultyId);
+    public Faculty getFacultyById(long id) {
+        return faculties.get(id);
     }
 
     @Override
-    public Faculty updateFaculty(Long facultyId, Faculty faculty) {
-        faculty.setId(facultyId);
-        faculties.put(facultyId, faculty);
+    public Faculty updateFaculty(long id, Faculty faculty) {
+        if(!faculties.containsKey(id)){
+            return null;
+        }
+        faculty.setId(id);
+        faculties.put(id, faculty);
         return faculty;
     }
 
     @Override
-    public Faculty deleteFaculty(Long facultyId) {
-        return faculties.remove(facultyId);
+    public Faculty deleteFaculty(long id) {
+        return faculties.remove(id);
     }
 
     @Override
