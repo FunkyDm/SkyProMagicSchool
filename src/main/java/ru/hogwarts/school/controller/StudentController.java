@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.impl.StudentServiceImpl;
 
+import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -23,27 +24,40 @@ public class StudentController {
         return studentServiceImpl.createStudent(student);
     }
 
-    @GetMapping("/{studentId}/get")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public Student getStudent(@PathVariable("studentId") Long studentId) {
-        return studentServiceImpl.getStudentById(studentId);
+    @GetMapping("/{id}/get")
+    //@ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<Student> getStudent(@PathVariable("studentId") long id) {
+        Student student = studentServiceImpl.getStudentById(id);
+        if (student == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(student);
     }
 
     @PutMapping("/{id}/update")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public Student updateStudent(@PathVariable("id") Long id,@RequestBody Student student) {
-        return studentServiceImpl.updateStudent(id, student);
+    //@ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<Student> updateStudent(@PathVariable("id") long id,
+                                                 @RequestBody Student student) {
+        Student foundStudent = studentServiceImpl.updateStudent(id, student);
+        if(foundStudent == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return ResponseEntity.ok(foundStudent);
     }
 
-    @DeleteMapping("/{studentId}/remove")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteStudent(@PathVariable("studentId") Long studentId) {
-        studentServiceImpl.deleteStudent(studentId);
+    @DeleteMapping("/{id}/remove")
+    //@ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> deleteStudent(@PathVariable("id") long id) {
+        studentServiceImpl.deleteStudent(id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/age")
-    public List<Student> filterStudentsByAge(@RequestParam int studentAge) {
-        return studentServiceImpl.filterStudentsByAge(studentAge);
+    public ResponseEntity<List<Student>> filterStudentsByAge(@RequestParam int age) {
+        if(age > 0){
+            return ResponseEntity.ok(studentServiceImpl.filterStudentsByAge(age));
+        }
+        return ResponseEntity.ok(Collections.emptyList());
     }
 
 }
