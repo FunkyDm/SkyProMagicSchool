@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 public class StudentServiceImpl implements StudentService {
     private final Map<Long, Student> studentRepository = new HashMap<>();
 
-    private static Long studentCounter = 1L;
+    private static long studentCounter = 1L;
 
     @PostConstruct
     public void init(){

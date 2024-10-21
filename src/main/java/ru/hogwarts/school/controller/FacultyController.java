@@ -23,22 +23,32 @@ public class FacultyController {
         return facultyServiceImpl.createFaculty(faculty);
     }
 
-    @GetMapping("/{facultyId}/get")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public Faculty getFaculty(@PathVariable("facultyId") Long facultyId) {
-        return facultyServiceImpl.getFacultyById(facultyId);
+    @GetMapping("/{id}/get")
+    //@ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<Faculty> getFaculty(@PathVariable("id") Long id) {
+        Faculty faculty = facultyServiceImpl.getFacultyById(id);
+        if(faculty == null){
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(faculty);
     }
 
     @PutMapping("/{id}/update")
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    public Faculty updateFaculty(@PathVariable("id") Long id, @RequestBody Faculty faculty) {
-        return facultyServiceImpl.updateFaculty(id, faculty);
+    //@ResponseStatus(HttpStatus.ACCEPTED)
+    public ResponseEntity<Faculty> updateFaculty(@PathVariable("id") Long id,
+                                                 @RequestBody Faculty faculty) {
+        Faculty foundFaculty = facultyServiceImpl.updateFaculty(id,faculty);
+        if(foundFaculty == null){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        return ResponseEntity.ok(foundFaculty);
     }
 
-    @DeleteMapping("/{facultyId}/remove")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteFaculty(@PathVariable("facultyId") Long facultyId) {
-        facultyServiceImpl.deleteFaculty(facultyId);
+    @DeleteMapping("/{id}/remove")
+    //@ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> deleteFaculty(@PathVariable("id") Long id) {
+        facultyServiceImpl.deleteFaculty(id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/colors")

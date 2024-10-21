@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 @Service
 public class FacultyServiceImpl implements FacultyService {
-    private final Map<Long, Faculty> faculties = new HashMap<>();
+    private final Map<Long, Faculty> facultiesRepository = new HashMap<>();
 
-    private static Long facultyCounter = 1L;
+    private static long facultyCounter = 1L;
 
     @PostConstruct
     public void init(){
@@ -29,33 +29,33 @@ public class FacultyServiceImpl implements FacultyService {
     @Override
     public Faculty createFaculty(Faculty faculty) {
         faculty.setId(facultyCounter++);
-        faculties.put(faculty.getId(), faculty);
+        facultiesRepository.put(faculty.getId(), faculty);
         return faculty;
     }
 
     @Override
     public Faculty getFacultyById(long id) {
-        return faculties.get(id);
+        return facultiesRepository.get(id);
     }
 
     @Override
     public Faculty updateFaculty(long id, Faculty faculty) {
-        if(!faculties.containsKey(id)){
+        if(!facultiesRepository.containsKey(id)){
             return null;
         }
         faculty.setId(id);
-        faculties.put(id, faculty);
+        facultiesRepository.put(id, faculty);
         return faculty;
     }
 
     @Override
     public Faculty deleteFaculty(long id) {
-        return faculties.remove(id);
+        return facultiesRepository.remove(id);
     }
 
     @Override
     public List<Faculty> filterFacultiesByColor(String color) {
-        return faculties.values().stream()
+        return facultiesRepository.values().stream()
                 .filter(f -> (Objects.equals(f.getColor(), color)))
                 .collect(Collectors.toList());
     }
