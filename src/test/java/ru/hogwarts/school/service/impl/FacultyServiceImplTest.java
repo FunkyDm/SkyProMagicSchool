@@ -2,20 +2,35 @@ package ru.hogwarts.school.service.impl;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import ru.hogwarts.school.exception.MissingFacultyException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
+@ExtendWith(MockitoExtension.class)
 class FacultyServiceImplTest {
-    private final FacultyServiceImpl out = new FacultyServiceImpl();
+    @Mock
+    private FacultyRepository facultyRepository;
+
+    @InjectMocks
+    private FacultyServiceImpl out;
 
     @Test
-    @DisplayName("Тест метода создания факультета")
+    @DisplayName("Тест метода добавления факультета")
     void createFaculty() {
         //setup
         Faculty expected = new Faculty("testName", "testColor");
+
+        when(facultyRepository.save(expected)).thenReturn(expected);
 
         //test
         Faculty actual = out.createFaculty(expected);
@@ -28,45 +43,79 @@ class FacultyServiceImplTest {
     @DisplayName("Тест метода получения факультета по id")
     void getFacultyById() {
         //setup
-        Faculty expected = new Faculty("testName", "testColor");
-        Faculty faculty = out.createFaculty(expected);
+        long id = 1L;
+        Faculty faculty = new Faculty("testName", "testColor");
+        faculty.setId(id);
+
+        when(facultyRepository.findById(id)).thenReturn(Optional.of(faculty));
 
         //test
-        Faculty actual = out.getFacultyById(faculty.getId());
+        Faculty actual = out.getFacultyById(id);
 
         //check
         assertEquals(actual, faculty);
+    }
+
+    @Test
+    @DisplayName("Тест выброса исключения при попытке найти несуществующий факультет")
+    void getFacultyByIdThrowsMissingFacultyException(){
+        //setup
+        long id = 1L;
+        when(facultyRepository.findById(id)).thenReturn(Optional.empty());
+
+        //check
+        assertThrows(MissingFacultyException.class, () -> out.getFacultyById(id));
     }
 
     @Test
     @DisplayName("Тест метода обновления факультета")
     void updateFaculty() {
         //setup
+        long id = 1L;
         Faculty expected = new Faculty("testName", "testColor");
-        Faculty faculty1 = out.createFaculty(expected);
+        expected.setId(id);
+
+        when(facultyRepository.existsById(id)).thenReturn(true);
+        when(facultyRepository.save(expected)).thenReturn(expected);
 
         //test
-        out.updateFaculty(faculty1.getId(), expected);
+        Faculty actual = out.updateFaculty(id, expected);
 
         //check
-        Faculty actual = out.getFacultyById(faculty1.getId());
         assertEquals(actual, expected);
+    }
+
+    @Test
+    @DisplayName("Тест выброса исключения при попытке обновления несуществуюзего факультета")
+    void updateFacultyMissingFacultyException(){
+        //setup
+        long id = 1L;
+        Faculty expected = new Faculty("testName", "testColor");
+        expected.setId(id);
+
+        //check
+        assertThrows(MissingFacultyException.class, () -> out.updateFaculty(id, expected));
     }
 
     @Test
     @DisplayName("Тест метода удаления факультета")
     void deleteFaculty() {
         //setup
+        long id = 1L;
         Faculty expected = new Faculty("testName", "testColor");
-        Faculty faculty = out.createFaculty(expected);
+        expected.setId(id);
+
+        when(facultyRepository.findById(id)).thenReturn(Optional.of(expected));
 
         //test
-        Faculty actual = out.deleteFaculty(faculty.getId());
+        Faculty actual = out.deleteFaculty(id);
 
         //check
-        assertEquals(actual, faculty);
-        Faculty faculty1 = out.getFacultyById(faculty.getId());
-        assertNull(faculty1);
+        assertEquals(actual, expected);
+
+        when(facultyRepository.findById(id)).thenReturn(Optional.empty());
+        Faculty deletedFaculty = out.getFacultyById(id);
+        assertNull(deletedFaculty);
     }
 
     @Test

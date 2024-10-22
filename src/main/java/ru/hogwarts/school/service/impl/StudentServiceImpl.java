@@ -2,7 +2,9 @@ package ru.hogwarts.school.service.impl;
 
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.exception.MissingStudentException;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
 import java.util.HashMap;
@@ -12,49 +14,41 @@ import java.util.stream.Collectors;
 
 @Service
 public class StudentServiceImpl implements StudentService {
-    private final Map<Long, Student> studentRepository = new HashMap<>();
+    private final StudentRepository studentRepository;
 
-    private static long studentCounter = 1L;
-
-    @PostConstruct
-    public void init(){
-        createStudent(new Student("Pavel", 40));
-        createStudent(new Student("Alexander", 35));
-        createStudent(new Student("Kirill", 49));
-        createStudent(new Student("Oleg", 40));
-        createStudent(new Student("Lexa", 35));
+    public StudentServiceImpl(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
     }
 
     @Override
     public Student createStudent(Student student) {
-        student.setId(studentCounter++);
-        studentRepository.put(student.getId(), student);
-        return student;
+        return studentRepository.save(student);
     }
 
     @Override
     public Student getStudentById(long id) {
-        return studentRepository.get(id);
+        return studentRepository.findById(id).orElseThrow(() -> new MissingStudentException("Такого студента нет"));
     }
 
     @Override
-    public Student updateStudent(long id, Student student) {
-        if(!studentRepository.containsKey(id)){
-            return null;
+    public Student updateStudent(long id, Student studentForUpdate) {
+        if (!studentRepository.existsById(id)) {
+            throw new MissingStudentException("Такого студента нет");
         }
-        student.setId(id);
-        studentRepository.put(id, student);
-        return student;
+        studentForUpdate.setId(id);
+        return studentRepository.save(studentForUpdate);
     }
 
     @Override
     public Student deleteStudent(long id) {
-        return studentRepository.remove(id);
+        Student student = studentRepository.findById(id).orElseThrow(() -> new MissingStudentException("Такого студента нет"));
+        studentRepository.delete(student);
+        return student;
     }
 
     @Override
     public List<Student> filterStudentsByAge(int age) {
-        return studentRepository.values().stream()
+        return studentRepository.findAll().stream()
                 .filter(s -> (s.getAge() == age))
                 .collect(Collectors.toList());
     }

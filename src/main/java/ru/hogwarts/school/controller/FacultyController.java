@@ -27,7 +27,7 @@ public class FacultyController {
 
     @GetMapping("/{id}/get")
     //@ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<Faculty> getFaculty(@PathVariable("id") Long id) {
+    public ResponseEntity<Faculty> getFaculty(@PathVariable("id") long id) {
         Faculty faculty = facultyServiceImpl.getFacultyById(id);
         if(faculty == null){
             return ResponseEntity.notFound().build();
@@ -37,7 +37,7 @@ public class FacultyController {
 
     @PutMapping("/{id}/update")
     //@ResponseStatus(HttpStatus.ACCEPTED)
-    public ResponseEntity<Faculty> updateFaculty(@PathVariable("id") Long id,
+    public ResponseEntity<Faculty> updateFaculty(@PathVariable("id") long id,
                                                  @RequestBody Faculty faculty) {
         Faculty foundFaculty = facultyServiceImpl.updateFaculty(id,faculty);
         if(foundFaculty == null){
@@ -48,7 +48,7 @@ public class FacultyController {
 
     @DeleteMapping("/{id}/remove")
     //@ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> deleteFaculty(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> deleteFaculty(@PathVariable("id") long id) {
         facultyServiceImpl.deleteFaculty(id);
         return ResponseEntity.ok().build();
     }
