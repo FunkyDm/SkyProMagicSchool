@@ -10,6 +10,7 @@ import ru.hogwarts.school.exception.MissingFacultyException;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repository.FacultyRepository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,7 +59,7 @@ class FacultyServiceImplTest {
 
     @Test
     @DisplayName("Тест выброса исключения при попытке найти несуществующий факультет")
-    void getFacultyByIdThrowsMissingFacultyException(){
+    void getFacultyByIdThrowsMissingFacultyException() {
         //setup
         long id = 1L;
         when(facultyRepository.findById(id)).thenReturn(Optional.empty());
@@ -86,8 +87,8 @@ class FacultyServiceImplTest {
     }
 
     @Test
-    @DisplayName("Тест выброса исключения при попытке обновления несуществуюзего факультета")
-    void updateFacultyMissingFacultyException(){
+    @DisplayName("Тест выброса исключения при попытке обновления несуществующего факультета")
+    void updateFacultyMissingFacultyException() {
         //setup
         long id = 1L;
         Faculty expected = new Faculty("testName", "testColor");
@@ -114,27 +115,47 @@ class FacultyServiceImplTest {
         assertEquals(actual, expected);
 
         when(facultyRepository.findById(id)).thenReturn(Optional.empty());
-        Faculty deletedFaculty = out.getFacultyById(id);
-        assertNull(deletedFaculty);
+        Optional<Faculty> deletedFaculty = facultyRepository.findById(id);
+        assertTrue(deletedFaculty.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Тест выброса исключения при попытке удаления несуществующего факультета")
+    void deleteFacultyMissingFacultyException() {
+        //setup
+        long id = 1L;
+        Faculty expected = new Faculty("testName", "testColor");
+        expected.setId(id);
+
+        when(facultyRepository.findById(id)).thenReturn(Optional.of(expected));
+
+        //test
+        Faculty actual = out.deleteFaculty(id);
+
+        //check
+        assertEquals(actual, expected);
+
+        when(facultyRepository.findById(id)).thenReturn(Optional.empty());
+        Optional<Faculty> deletedFaculty = facultyRepository.findById(id);
+        assertTrue(deletedFaculty.isEmpty());
     }
 
     @Test
     @DisplayName("Тест метода фильтрации факультетов по цвету")
     void filterFacultiesByColor() {
         //setup
-        String color = "Red";
+        Faculty faculty1 = new Faculty("testName1", "Red");
+        Faculty faculty2 = new Faculty("testName2", "Blue");
+        Faculty faculty3 = new Faculty("testName3", "Red");
 
-        Faculty faculty = new Faculty("testName", "Yellow");
-        Faculty expected = new Faculty("testName", color);
-        Faculty expected2 = new Faculty("testName", color);
-        Faculty testFaculty = out.createFaculty(faculty);
-        Faculty testFaculty1 = out.createFaculty(expected);
-        Faculty testFaculty2 = out.createFaculty(expected2);
+        List<Faculty> allFaculties = Arrays.asList(faculty1, faculty2, faculty3);
+        when(facultyRepository.findAll()).thenReturn(allFaculties);
 
         //test
-        List<Faculty> actual = out.filterFacultiesByColor(color);
+        List<Faculty> result = out.filterFacultiesByColor("Red");
 
         //check
-        assertTrue(actual.containsAll(List.of(expected, expected2)));
+        assertTrue(result.contains(faculty1));
+        assertTrue(result.contains(faculty3));
     }
 }

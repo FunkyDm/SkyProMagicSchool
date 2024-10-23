@@ -1,6 +1,5 @@
 package ru.hogwarts.school.service.impl;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.exception.MissingFacultyException;
 import ru.hogwarts.school.model.Faculty;
@@ -25,13 +24,13 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public Faculty getFacultyById(long id) {
-        return facultyRepository.findById(id).orElseThrow(() -> new MissingFacultyException("Такого факультета нет"));
+        return facultyRepository.findById(id).orElseThrow(() -> new MissingFacultyException(id));
     }
 
     @Override
     public Faculty updateFaculty(long id, Faculty facultyForUpdate) {
         if (!facultyRepository.existsById(id)) {
-            throw new MissingFacultyException("такого факультета нет");
+            throw new MissingFacultyException(id);
         }
         facultyForUpdate.setId(id);
         return facultyRepository.save(facultyForUpdate);
@@ -39,7 +38,7 @@ public class FacultyServiceImpl implements FacultyService {
 
     @Override
     public Faculty deleteFaculty(long id) {
-        Faculty faculty = facultyRepository.findById(id).orElseThrow(() -> new MissingFacultyException("Такого факультета нет"));
+        Faculty faculty = facultyRepository.findById(id).orElseThrow(() -> new MissingFacultyException(id));
         facultyRepository.delete(faculty);
         return faculty;
     }
