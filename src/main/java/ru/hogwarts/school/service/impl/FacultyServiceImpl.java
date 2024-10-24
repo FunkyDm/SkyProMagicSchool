@@ -1,8 +1,9 @@
 package ru.hogwarts.school.service.impl;
 
-import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.exception.MissingFacultyException;
 import ru.hogwarts.school.model.Faculty;
+import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.service.FacultyService;
 
 import java.util.*;
@@ -10,49 +11,41 @@ import java.util.stream.Collectors;
 
 @Service
 public class FacultyServiceImpl implements FacultyService {
-    private final Map<Long, Faculty> facultiesRepository = new HashMap<>();
+    private final FacultyRepository facultyRepository;
 
-    private static long facultyCounter = 1L;
-
-    @PostConstruct
-    public void init(){
-        createFaculty(new Faculty("Первый", "Красный"));
-        createFaculty(new Faculty("Второй", "Зеленый"));
-        createFaculty(new Faculty("Третий", "Оранжевый"));
-        createFaculty(new Faculty("Четвертый", "Сиреневый"));
-        createFaculty(new Faculty("Пятый", "Синий"));
+    public FacultyServiceImpl(FacultyRepository facultyRepository) {
+        this.facultyRepository = facultyRepository;
     }
 
     @Override
     public Faculty createFaculty(Faculty faculty) {
-        faculty.setId(facultyCounter++);
-        facultiesRepository.put(faculty.getId(), faculty);
-        return faculty;
+        return facultyRepository.save(faculty);
     }
 
     @Override
     public Faculty getFacultyById(long id) {
-        return facultiesRepository.get(id);
+        return facultyRepository.findById(id).orElseThrow(() -> new MissingFacultyException(id));
     }
 
     @Override
-    public Faculty updateFaculty(long id, Faculty faculty) {
-        if(!facultiesRepository.containsKey(id)){
-            return null;
+    public Faculty updateFaculty(long id, Faculty facultyForUpdate) {
+        if (!facultyRepository.existsById(id)) {
+            throw new MissingFacultyException(id);
         }
-        faculty.setId(id);
-        facultiesRepository.put(id, faculty);
-        return faculty;
+        facultyForUpdate.setId(id);
+        return facultyRepository.save(facultyForUpdate);
     }
 
     @Override
     public Faculty deleteFaculty(long id) {
-        return facultiesRepository.remove(id);
+        Faculty faculty = facultyRepository.findById(id).orElseThrow(() -> new MissingFacultyException(id));
+        facultyRepository.delete(faculty);
+        return faculty;
     }
 
     @Override
     public List<Faculty> filterFacultiesByColor(String color) {
-        return facultiesRepository.values().stream()
+        return facultyRepository.findAll().stream()
                 .filter(f -> (Objects.equals(f.getColor(), color)))
                 .collect(Collectors.toList());
     }
