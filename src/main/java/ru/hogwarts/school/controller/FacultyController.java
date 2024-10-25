@@ -29,7 +29,7 @@ public class FacultyController {
     //@ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Faculty> getFaculty(@PathVariable("id") long id) {
         Faculty faculty = facultyServiceImpl.getFacultyById(id);
-        if(faculty == null){
+        if (faculty == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(faculty);
@@ -39,8 +39,8 @@ public class FacultyController {
     //@ResponseStatus(HttpStatus.ACCEPTED)
     public ResponseEntity<Faculty> updateFaculty(@PathVariable("id") long id,
                                                  @RequestBody Faculty faculty) {
-        Faculty foundFaculty = facultyServiceImpl.updateFaculty(id,faculty);
-        if(foundFaculty == null){
+        Faculty foundFaculty = facultyServiceImpl.updateFaculty(id, faculty);
+        if (foundFaculty == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         return ResponseEntity.ok(foundFaculty);
@@ -55,10 +55,16 @@ public class FacultyController {
 
     @GetMapping("/colors")
     public ResponseEntity<List<Faculty>> filterFacultiesByColor(@RequestParam String color) {
-        if(color != null && !color.isBlank()){
+        if (color != null && !color.isBlank()) {
             return ResponseEntity.ok(facultyServiceImpl.filterFacultiesByColor(color));
         }
         return ResponseEntity.ok(Collections.emptyList());
+    }
+
+    @GetMapping("/colors-or-name")
+    public List<Faculty> getFacultyByColorIgnoreCaseOrNameIgnoreCase(@RequestParam(value = "color", required = false) String color,
+                                                                     @RequestParam(value = "name", required = false) String name) {
+        return facultyServiceImpl.getFacultyByColorIgnoreCaseOrNameIgnoreCase(color, name);
     }
 
 }

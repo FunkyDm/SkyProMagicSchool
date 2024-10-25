@@ -50,4 +50,9 @@ public class FacultyServiceImpl implements FacultyService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<Faculty> getFacultyByColorIgnoreCaseOrNameIgnoreCase(String color, String name){
+        return facultyRepository.getFacultyByColorIgnoreCaseOrNameIgnoreCase(color, name);
+    }
+
 }

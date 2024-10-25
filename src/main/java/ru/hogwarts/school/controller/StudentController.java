@@ -39,7 +39,7 @@ public class StudentController {
     public ResponseEntity<Student> updateStudent(@PathVariable("id") long id,
                                                  @RequestBody Student student) {
         Student foundStudent = studentServiceImpl.updateStudent(id, student);
-        if(foundStudent == null){
+        if (foundStudent == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         return ResponseEntity.ok(foundStudent);
@@ -54,10 +54,16 @@ public class StudentController {
 
     @GetMapping("/age")
     public ResponseEntity<List<Student>> filterStudentsByAge(@RequestParam int age) {
-        if(age > 0){
+        if (age > 0) {
             return ResponseEntity.ok(studentServiceImpl.filterStudentsByAge(age));
         }
         return ResponseEntity.ok(Collections.emptyList());
+    }
+
+    @GetMapping("/age-between")
+    public List<Student> findByAgeBetween(@RequestParam(value = "min") int min,
+                                          @RequestParam(value = "max") int max) {
+        return studentServiceImpl.findByAgeBetween(min, max);
     }
 
 }
