@@ -2,9 +2,8 @@ package ru.hogwarts.school.service.impl;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
+import ru.hogwarts.school.exception.MissingAvatarException;
 import ru.hogwarts.school.exception.MissingStudentException;
 import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Student;
@@ -14,13 +13,10 @@ import ru.hogwarts.school.repository.StudentRepository;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.sql.SQLOutput;
 import java.util.UUID;
 
-import static java.nio.file.StandardOpenOption.CREATE_NEW;
-
 @Service
-public class AvatarServiceImpl {
+public class AvatarServiceImpl implements ru.hogwarts.school.service.AvatarService {
     @Value("${path.dir}")
     private Path pathDir;
 
@@ -33,12 +29,44 @@ public class AvatarServiceImpl {
         this.avatarRepository = avatarRepository;
     }
 
+    @Override
     public void uploadImage(long id, MultipartFile multipartFile) throws IOException {
-        Student student = studentRepository.findById(id).orElseThrow(() -> new MissingStudentException(id));
 
         createDirectory();
 
         Path filePath = pathDir.resolve(UUID.randomUUID() + "." + getExtension(multipartFile.getOriginalFilename()));
+
+        createAvatar(filePath, multipartFile, id);
+
+        multipartFile.transferTo(filePath);
+
+    }
+
+    @Override
+    public Avatar getAvatarFromDb(long id) {
+        checkStudentExistById(id);
+
+        return avatarRepository.getByStudentId(id)
+                .orElseThrow(() -> new MissingAvatarException(id));
+    }
+
+    @Override
+    public byte[] getAvatarFromLocal(long id){
+        checkStudentExistById(id);
+
+        Avatar avatar = avatarRepository.getByStudentId(id)
+                .orElseThrow(() -> new MissingAvatarException(id));
+        String filePath = avatar.getFilePath();
+        try(BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(filePath))){
+            return bufferedInputStream.readAllBytes();
+        } catch (IOException e){
+            throw new IllegalArgumentException("Чтение картинки не удалось" + e.getMessage());
+        }
+    }
+
+    private void createAvatar(Path filePath, MultipartFile multipartFile, long id) throws IOException {
+        Student student = studentRepository.findById(id)
+                .orElseThrow(() -> new MissingStudentException(id));
 
         avatarRepository.save(new Avatar(
                 filePath.toString(),
@@ -47,21 +75,6 @@ public class AvatarServiceImpl {
                 multipartFile.getBytes(),
                 student
         ));
-
-        multipartFile.transferTo(filePath);
-
-//        try(BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(new FileOutputStream(filePath.toString()))){
-//            bufferedOutputStream.write(multipartFile.getBytes(), 0, multipartFile.getBytes().length);
-//        }
-//
-//        try (InputStream is = multipartFile.getInputStream();
-//             OutputStream os = Files.newOutputStream(filePath, CREATE_NEW);
-//             BufferedInputStream bis = new BufferedInputStream(is, 1024);
-//             BufferedOutputStream bos = new BufferedOutputStream(os, 1024)) {
-//            bis.transferTo(bos);
-//        }
-//
-//        Files.copy(multipartFile.getInputStream(), filePath);
     }
 
     private String getExtension(String originalPath) {
@@ -74,4 +87,12 @@ public class AvatarServiceImpl {
             Files.createDirectories(path);
         }
     }
+
+    private void checkStudentExistById(long id) {
+        boolean studentExist = studentRepository.existsById(id);
+        if (!studentExist) {
+            throw new MissingStudentException(id);
+        }
+    }
+
 }
