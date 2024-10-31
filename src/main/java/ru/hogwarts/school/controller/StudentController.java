@@ -13,21 +13,21 @@ import java.util.List;
 @RestController
 @RequestMapping("/student")
 public class StudentController {
-    private final StudentServiceImpl studentServiceImpl;
+    private final StudentServiceImpl studentService;
 
-    public StudentController(StudentServiceImpl studentServiceImpl) {
-        this.studentServiceImpl = studentServiceImpl;
+    public StudentController(StudentServiceImpl studentService) {
+        this.studentService = studentService;
     }
 
     @PostMapping("/add")
     @ResponseStatus(HttpStatus.CREATED)
     public Student createStudent(@RequestBody Student student) {
-        return studentServiceImpl.createStudent(student);
+        return studentService.createStudent(student);
     }
 
     @GetMapping("/{id}/get")
     public ResponseEntity<Student> getStudent(@PathVariable("id") long id) {
-        Student student = studentServiceImpl.getStudentById(id);
+        Student student = studentService.getStudentById(id);
         if (student == null) {
             return ResponseEntity.notFound().build();
         }
@@ -37,7 +37,7 @@ public class StudentController {
     @PutMapping("/{id}/update")
     public ResponseEntity<Student> updateStudent(@PathVariable("id") long id,
                                                  @RequestBody Student student) {
-        Student foundStudent = studentServiceImpl.updateStudent(id, student);
+        Student foundStudent = studentService.updateStudent(id, student);
         if (foundStudent == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
@@ -46,14 +46,14 @@ public class StudentController {
 
     @DeleteMapping("/{id}/remove")
     public ResponseEntity<Void> deleteStudent(@PathVariable("id") long id) {
-        studentServiceImpl.deleteStudent(id);
+        studentService.deleteStudent(id);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/age")
     public ResponseEntity<List<Student>> filterStudentsByAge(@RequestParam int age) {
         if (age > 0) {
-            return ResponseEntity.ok(studentServiceImpl.filterStudentsByAge(age));
+            return ResponseEntity.ok(studentService.filterStudentsByAge(age));
         }
         return ResponseEntity.ok(Collections.emptyList());
     }
@@ -61,12 +61,12 @@ public class StudentController {
     @GetMapping("/age-between")
     public List<Student> findByAgeBetween(@RequestParam(value = "min") int min,
                                           @RequestParam(value = "max") int max) {
-        return studentServiceImpl.findByAgeBetween(min, max);
+        return studentService.findByAgeBetween(min, max);
     }
 
     @GetMapping("/{id}/get/faculty")
     public Faculty getFacultyByStudentId(@PathVariable("id") long id) {
-        return studentServiceImpl.getFacultyByStudentId(id);
+        return studentService.getFacultyByStudentId(id);
     }
 
 }
