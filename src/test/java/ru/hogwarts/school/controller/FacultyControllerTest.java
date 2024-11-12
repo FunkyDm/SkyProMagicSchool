@@ -4,21 +4,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.mock.mockito.SpyBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
-import ru.hogwarts.school.repository.FacultyRepository;
-import ru.hogwarts.school.repository.StudentRepository;
 import ru.hogwarts.school.service.impl.FacultyServiceImpl;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
@@ -28,15 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(FacultyController.class)
 class FacultyControllerTest {
 
-    //    @SpyBean
     @MockBean
     private FacultyServiceImpl facultyService;
-
-//    @MockBean
-//    private FacultyRepository facultyRepository;
-//
-//    @MockBean
-//    private StudentRepository studentRepository;
 
     @Autowired
     private MockMvc mvc;
@@ -61,7 +48,6 @@ class FacultyControllerTest {
         Faculty faculty = new Faculty("testName", "testColor");
         faculty.setId(1L);
 
-        //when(facultyRepository.findById(1l)).thenReturn(Optional.of(faculty));
         when(facultyService.getFacultyById(1L)).thenReturn(faculty);
 
         mvc.perform(get("/faculty/1/get"))
@@ -72,7 +58,6 @@ class FacultyControllerTest {
 
     @Test
     public void getFaculty_WhenFacultyNotFound() throws Exception {
-        //when(facultyRepository.findById(1L)).thenReturn(Optional.of(new Faculty("testName", "testColor")));
         when(facultyService.getFacultyById(1L)).thenReturn(null);
 
         mvc.perform(get("/faculty/1/get"))
@@ -87,10 +72,6 @@ class FacultyControllerTest {
         Faculty existingFaculty = new Faculty("testName", "testColor");
         existingFaculty.setId(1L);
 
-//        when(facultyRepository.existsById(1L)).thenReturn(true);
-//        when(facultyRepository.findById(1L)).thenReturn(Optional.of(existingFaculty));
-//        when(facultyRepository.save(any(Faculty.class))).thenReturn(updatedFaculty);
-
         when(facultyService.updateFaculty(eq(1L), any(Faculty.class))).thenReturn(updatedFaculty);
 
         mvc.perform(put("/faculty/1/update")
@@ -102,7 +83,7 @@ class FacultyControllerTest {
     }
 
     @Test
-    public void updateFactulty_WhenFacultyNotFound() throws Exception {
+    public void updateFaculty_WhenFacultyNotFound() throws Exception {
         when(facultyService.updateFaculty(eq(1L), any(Faculty.class))).thenReturn(null);
 
         mvc.perform(put("/faculty/1/update")
@@ -118,7 +99,7 @@ class FacultyControllerTest {
     }
 
     @Test
-    public void filterFacultiesByColor() throws Exception{
+    public void filterFacultiesByColor() throws Exception {
         Faculty faculty = new Faculty("testName", "testColor");
         faculty.setId(1L);
 
@@ -132,7 +113,7 @@ class FacultyControllerTest {
     }
 
     @Test
-    public void filterFacultiesByColor_WhenFacultyCollectionIsEmpty() throws Exception{
+    public void filterFacultiesByColor_WhenFacultyCollectionIsEmpty() throws Exception {
         when(facultyService.filterFacultiesByColor("testColor")).thenReturn(Collections.emptyList());
 
         mvc.perform(get("/faculty/colors").param("color", "testName"))
@@ -141,15 +122,15 @@ class FacultyControllerTest {
     }
 
     @Test
-    public void getFacultyByColorIngoreCaseOrNameIgnoreCase() throws Exception{
+    public void getFacultyByColorIgnoreCaseOrNameIgnoreCase() throws Exception {
         Faculty faculty = new Faculty("testName", "testColor");
         faculty.setId(1L);
 
-        when(facultyService.getFacultyByColorIgnoreCaseOrNameIgnoreCase("testColor" , "testName")).thenReturn(List.of(faculty));
+        when(facultyService.getFacultyByColorIgnoreCaseOrNameIgnoreCase("testColor", "testName")).thenReturn(List.of(faculty));
 
         mvc.perform(get("/faculty/colors-or-name")
-                .param("color", "testColor")
-                .param("name" , "testName"))
+                        .param("color", "testColor")
+                        .param("name", "testName"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].name").value("testName"))
@@ -157,7 +138,7 @@ class FacultyControllerTest {
     }
 
     @Test
-    public void findFacultyByStudentId() throws Exception{
+    public void findFacultyByStudentId() throws Exception {
         Student student = new Student("testName", 22);
         student.setId(1L);
 
