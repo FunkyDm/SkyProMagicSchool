@@ -23,7 +23,7 @@ class StudentServiceImplTest {
     private StudentRepository studentRepository;
 
     @InjectMocks
-    private StudentServiceImpl out;
+    private StudentServiceImpl studentService;
 
     @Test
     @DisplayName("Тест метода создания студента")
@@ -34,7 +34,7 @@ class StudentServiceImplTest {
         when(studentRepository.save(expected)).thenReturn(expected);
 
         //test
-        Student actual = out.createStudent(expected);
+        Student actual = studentService.createStudent(expected);
 
         //check
         assertEquals(expected, actual);
@@ -51,7 +51,7 @@ class StudentServiceImplTest {
         when(studentRepository.findById(id)).thenReturn(Optional.of(expected));
 
         //test
-        Student actual = out.getStudentById(id);
+        Student actual = studentService.getStudentById(id);
 
         //check
         assertEquals(actual, expected);
@@ -65,7 +65,7 @@ class StudentServiceImplTest {
         when(studentRepository.findById(id)).thenReturn(Optional.empty());
 
         //check
-        assertThrows(MissingStudentException.class, () -> out.getStudentById(id));
+        assertThrows(MissingStudentException.class, () -> studentService.getStudentById(id));
     }
 
     @Test
@@ -80,7 +80,7 @@ class StudentServiceImplTest {
         when(studentRepository.save(expected)).thenReturn(expected);
 
         //test
-        Student actual = out.updateStudent(id, expected);
+        Student actual = studentService.updateStudent(id, expected);
 
         //check
         assertEquals(actual, expected);
@@ -95,7 +95,7 @@ class StudentServiceImplTest {
         expected.setId(id);
 
         //check
-        assertThrows(MissingStudentException.class, () -> out.updateStudent(id, expected));
+        assertThrows(MissingStudentException.class, () -> studentService.updateStudent(id, expected));
     }
 
     @Test
@@ -109,7 +109,7 @@ class StudentServiceImplTest {
         when(studentRepository.findById(id)).thenReturn(Optional.of(expected));
 
         //test
-        Student actual = out.deleteStudent(id);
+        Student actual = studentService.deleteStudent(id);
 
         //check
         assertEquals(actual, expected);
@@ -130,7 +130,7 @@ class StudentServiceImplTest {
         when(studentRepository.findById(id)).thenReturn(Optional.of(expected));
 
         //test
-        Student actual = out.deleteStudent(id);
+        Student actual = studentService.deleteStudent(id);
 
         //check
         assertEquals(actual, expected);
@@ -152,10 +152,43 @@ class StudentServiceImplTest {
         when(studentRepository.findAll()).thenReturn(allStudents);
 
         //test
-        List<Student> result = out.filterStudentsByAge(20);
+        List<Student> result = studentService.filterStudentsByAge(20);
 
         //check
         assertTrue(result.contains(student1));
         assertTrue(result.contains(student3));
     }
+
+    @Test
+    void testGetAllStudentsAmount() {
+        when(studentRepository.getAllStudentsAmount()).thenReturn(100);
+
+        Integer result = studentService.getAllStudentsAmount();
+        assertEquals(100, result);
+    }
+
+    @Test
+    void testGetAvgStudentAge() {
+        when(studentRepository.getAvgStudentAge()).thenReturn(18.75);
+
+        Double result = studentService.getAvgStudentAge();
+        assertEquals(18.75, result);
+    }
+
+    @Test
+    void testGetLastFiveStudents() {
+        Student student1 = new Student("test1",20);
+        Student student2 = new Student("test2",20);
+        Student student3 = new Student("test3",20);
+        Student student4 = new Student("test4",20);
+        Student student5 = new Student("test5",20);
+        List<Student> lastFiveStudents = Arrays.asList(student1, student2, student3, student4, student5);
+
+        when(studentRepository.getLastFiveStudents()).thenReturn(lastFiveStudents);
+
+        List<Student> result = studentService.getLastFiveStudents();
+        assertEquals(5, result.size());
+        assertEquals(lastFiveStudents, result);
+    }
+
 }
