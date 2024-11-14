@@ -64,4 +64,19 @@ public class StudentServiceImpl implements ru.hogwarts.school.service.StudentSer
         return facultyRepository.findByStudentsId(id);
     }
 
+    @Override
+    public Integer getAllStudentsAmount(){
+        return studentRepository.getAllStudentsAmount();
+    }
+
+    @Override
+    public Double getAvgStudentAge(){
+        return studentRepository.getAvgStudentAge();
+    }
+
+    @Override
+    public List<Student> getLastFiveStudents(){
+        return studentRepository.getLastFiveStudents();
+    }
+
 }
