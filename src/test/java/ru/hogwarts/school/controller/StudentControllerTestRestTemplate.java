@@ -18,7 +18,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class FacultyControllerTest {
+class StudentControllerTestRestTemplate {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -33,80 +33,70 @@ class FacultyControllerTest {
     public void setup(){
         studentRepository.deleteAll();
         facultyRepository.deleteAll();
-        facultyRepository.save(new Faculty("testName", "testColor"));
+        studentRepository.save(new Student("testName", 22));
     }
 
     @Test
-    public void createFaculty() {
+    void createStudent() {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>("{\"name\": \"testName\", \"color\": \"testColor\"}", headers);
+        HttpEntity<String> request = new HttpEntity<>("{\"name\": \"testName\", \"age\": \"22\"}", headers);
 
-        ResponseEntity<Faculty> response = restTemplate.postForEntity("/faculty/add", request, Faculty.class);
+        ResponseEntity<Student> response = restTemplate.postForEntity("/student/add", request, Student.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getName()).isEqualTo("testName");
-        assertThat(response.getBody().getColor()).isEqualTo("testColor");
+        assertThat(response.getBody().getAge()).isEqualTo(22);
 
-        List<Faculty> faculties = facultyRepository.findAll();
-        assertThat(faculties).hasSize(2);
+        List<Student> students = studentRepository.findAll();
+        assertThat(students).hasSize(2);
     }
 
     @Test
-    public void getFaculty(){
-        Faculty faculty = facultyRepository.save(new Faculty("testName", "testColor"));
+    public void getStudent(){
+        Student student = studentRepository.save(new Student("testName", 22));
 
-        ResponseEntity<Faculty> response = restTemplate.getForEntity("/faculty/" + faculty.getId() + "/get", Faculty.class);
+        ResponseEntity<Student> response = restTemplate.getForEntity("/student/" + student.getId() + "/get", Student.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().getId()).isEqualTo(faculty.getId());
+        assertThat(response.getBody().getId()).isEqualTo(student.getId());
         assertThat(response.getBody().getName()).isEqualTo("testName");
-        assertThat(response.getBody().getColor()).isEqualTo("testColor");
+        assertThat(response.getBody().getAge()).isEqualTo(22);
     }
 
     @Test
-    public void updateFaculty(){
-        Faculty existingFaculty = facultyRepository.save(new Faculty("testName", "testColor"));
+    public void updateStudent(){
+        Student existingStudent = studentRepository.save(new Student("testName", 22));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>("{\"name\": \"testNameUpdated\", \"color\": \"testColor\"}", headers);
+        HttpEntity<String> request = new HttpEntity<>("{\"name\": \"testNameUpdated\", \"age\": \"22\"}", headers);
 
-        ResponseEntity<Faculty> response = restTemplate.exchange("/faculty/" + existingFaculty.getId() + "/update", HttpMethod.PUT, request, Faculty.class);
+        ResponseEntity<Student> response = restTemplate.exchange("/student/" + existingStudent.getId() + "/update", HttpMethod.PUT, request, Student.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody().getName()).isEqualTo("testNameUpdated");
 
-       Faculty updatedFaculty = facultyRepository.findById(existingFaculty.getId()).orElse(null);
-       assertThat(updatedFaculty).isNotNull();
-       assertThat(updatedFaculty.getName()).isEqualTo("testNameUpdated");
+        Student updatedStudent = studentRepository.findById(existingStudent.getId()).orElse(null);
+        assertThat(updatedStudent).isNotNull();
+        assertThat(updatedStudent.getName()).isEqualTo("testNameUpdated");
     }
 
     @Test
-    public void deleteFaculty(){
-        Faculty deletedFaculty = facultyRepository.save(new Faculty("testName", "testColor"));
+    public void deleteStudent(){
+        Student deletedStudent = studentRepository.save(new Student("testName", 22));
 
-        ResponseEntity<Void> response = restTemplate.exchange("/faculty/" + deletedFaculty.getId() + "/remove", HttpMethod.DELETE, null, Void.class);
+        ResponseEntity<Void> response = restTemplate.exchange("/student/" + deletedStudent.getId() + "/remove", HttpMethod.DELETE, null, Void.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
-    public void filterFacultiesByColor(){
-        ResponseEntity<Faculty[]> response = restTemplate.getForEntity("/faculty/colors?color=testColor&name=testColor", Faculty[].class);
-
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody().length).isGreaterThanOrEqualTo(1);
-        assertThat(response.getBody()[0].getName()).isEqualTo("testName");
-    }
-
-    @Test
-    public void getFacultyByColorIgnoreCaseOrNameIgnoreCase(){
-        ResponseEntity<Faculty[]> response = restTemplate.getForEntity("/faculty/colors-or-name?color=testColor&name=testName", Faculty[].class);
+    public void filterStudentsByAge(){
+        ResponseEntity<Student[]> response = restTemplate.getForEntity("/student/age?age=22", Student[].class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
@@ -115,17 +105,27 @@ class FacultyControllerTest {
     }
 
     @Test
-    public void findFacultyByStudentId(){
-        Faculty faculty = facultyRepository.save(new Faculty("testName", "testColor"));
+    public void findByAgeBetween(){
+        ResponseEntity<Student[]> response = restTemplate.getForEntity("/student/age-between?min=19&max=22", Student[].class);
+
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody().length).isGreaterThanOrEqualTo(1);
+        assertThat(response.getBody()[0].getName()).isEqualTo("testName");
+    }
+
+    @Test
+    public void getFacultyByStudentId(){
         Student student = new Student("testName", 22);
+        Faculty faculty = facultyRepository.save(new Faculty("testName", "testColor"));
         student.setFaculty(faculty);
         studentRepository.save(student);
 
-        ResponseEntity<Student[]> response = restTemplate.getForEntity("/faculty/" + faculty.getId() + "/get/students", Student[].class);
+        ResponseEntity<Faculty> response = restTemplate.getForEntity("/student/" + student.getId() + "/get/faculty", Faculty.class);
 
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
-        assertThat(response.getBody()[0].getName()).isEqualTo("testName");
+        assertThat(response.getBody().getName()).isEqualTo("testName");
     }
 
 }
