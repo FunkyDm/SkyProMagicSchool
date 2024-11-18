@@ -65,12 +65,12 @@ public class StudentServiceImpl implements ru.hogwarts.school.service.StudentSer
     }
 
     @Override
-    public Integer getAllStudentsAmount(){
+    public int getAllStudentsAmount(){
         return studentRepository.getAllStudentsAmount();
     }
 
     @Override
-    public Double getAvgStudentAge(){
+    public double getAvgStudentAge(){
         return studentRepository.getAvgStudentAge();
     }
 
