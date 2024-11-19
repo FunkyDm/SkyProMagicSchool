@@ -1,0 +1,3 @@
+databaseChangelog:
+  - include:
+      file: liquibase/scripts/user.sql
