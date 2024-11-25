@@ -83,4 +83,12 @@ public class FacultyServiceImpl implements ru.hogwarts.school.service.FacultySer
         return studentRepository.findByFacultyId(id);
     }
 
+    @Override
+    public String findFacultyLongestName(){
+        return facultyRepository.findAll().stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparingInt(String::length))
+                .orElseThrow();
+    }
+
 }
