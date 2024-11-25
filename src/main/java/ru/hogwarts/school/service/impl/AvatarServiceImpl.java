@@ -45,6 +45,7 @@ public class AvatarServiceImpl implements ru.hogwarts.school.service.AvatarServi
 
         createAvatar(filePath, multipartFile, id);
 
+        logger.debug("Image was uploading to directory");
         multipartFile.transferTo(filePath);
 
     }
@@ -53,6 +54,7 @@ public class AvatarServiceImpl implements ru.hogwarts.school.service.AvatarServi
     public Avatar getAvatarFromDb(long id) {
         checkStudentExistById(id);
 
+        logger.info("Was invoked method for getting avatar from db");
         return avatarRepository.getByStudentId(id)
                 .orElseThrow(() -> new MissingAvatarException(id));
     }
@@ -62,9 +64,13 @@ public class AvatarServiceImpl implements ru.hogwarts.school.service.AvatarServi
         checkStudentExistById(id);
 
         Avatar avatar = avatarRepository.getByStudentId(id)
-                .orElseThrow(() -> new MissingAvatarException(id));
+                .orElseThrow(() -> {
+                    logger.error("There is not avatar with id = {}", id);
+                    return new MissingAvatarException(id);
+                });
         String filePath = avatar.getFilePath();
         try(BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(filePath))){
+            logger.debug("Чтение картинки");
             return bufferedInputStream.readAllBytes();
         } catch (IOException e){
             throw new IllegalArgumentException("Чтение картинки не удалось" + e.getMessage());
@@ -84,7 +90,7 @@ public class AvatarServiceImpl implements ru.hogwarts.school.service.AvatarServi
                     return new MissingStudentException(id);
                 });
 
-        logger.info("Was invoked method for creating directory for images");
+        logger.info("Was invoked method for creating avatar");
         avatarRepository.save(new Avatar(
                 filePath.toString(),
                 multipartFile.getSize(),
