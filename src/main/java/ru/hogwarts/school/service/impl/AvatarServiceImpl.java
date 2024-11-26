@@ -22,7 +22,7 @@ import java.util.UUID;
 
 @Service
 public class AvatarServiceImpl implements ru.hogwarts.school.service.AvatarService {
-    Logger logger = LoggerFactory.getLogger(AvatarService.class);
+    private final Logger logger = LoggerFactory.getLogger(AvatarService.class);
 
     @Value("${path.dir}")
     private Path pathDir;

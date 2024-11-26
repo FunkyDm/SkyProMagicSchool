@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class InfoController {
 
     @Value("${server.port}")
-    String serverPort;
+    private String serverPort;
 
     @GetMapping("/get/port")
     public ResponseEntity<String> getCurrentRunningApplicationPort(){
