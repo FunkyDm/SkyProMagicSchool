@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class FacultyServiceImpl implements ru.hogwarts.school.service.FacultyService {
-    Logger logger = LoggerFactory.getLogger(FacultyService.class);
+    private final Logger logger = LoggerFactory.getLogger(FacultyService.class);
 
     private final FacultyRepository facultyRepository;
 
