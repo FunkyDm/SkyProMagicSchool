@@ -7,7 +7,7 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repository.FacultyRepository;
 import ru.hogwarts.school.repository.StudentRepository;
 
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,7 +55,7 @@ public class StudentServiceImpl implements ru.hogwarts.school.service.StudentSer
     }
 
     @Override
-    public List<Student> findByAgeBetween(int min, int max){
+    public List<Student> findByAgeBetween(int min, int max) {
         return studentRepository.findByAgeBetween(min, max);
     }
 
@@ -65,18 +65,56 @@ public class StudentServiceImpl implements ru.hogwarts.school.service.StudentSer
     }
 
     @Override
-    public int getAllStudentsAmount(){
+    public int getAllStudentsAmount() {
         return studentRepository.getAllStudentsAmount();
     }
 
     @Override
-    public double getAvgStudentAge(){
+    public double getAvgStudentAge() {
         return studentRepository.getAvgStudentAge();
     }
 
     @Override
-    public List<Student> getLastFiveStudents(){
+    public List<Student> getLastFiveStudents() {
         return studentRepository.getLastFiveStudents();
+    }
+
+    @Override
+    public void printParallel() {
+        List<Student> students = new ArrayList<>(studentRepository.findAll());
+        printInStream(students, 0, 2);
+        List<Thread> threadList = List.of(
+                new Thread(() -> printInStream(students, 2, 2)),
+                new Thread(() -> printInStream(students, 4, 2)));
+        for(Thread thread : threadList){
+            thread.start();
+        }
+    }
+
+    @Override
+    public void printParallelSynchronized() {
+        List<Student> students = new ArrayList<>(studentRepository.findAll());
+        printInStreamSynchronized(students, 0, 2);
+        List<Thread> threadList = List.of(
+                new Thread(() -> printInStreamSynchronized(students, 2, 2)),
+                new Thread(() -> printInStreamSynchronized(students, 4, 2)));
+        for(Thread thread : threadList){
+            thread.start();
+        }
+    }
+
+    private void printInStreamSynchronized(Collection<Student> students, int offSet, int limit){
+        synchronized (this){
+            printInStream(students, offSet, limit);
+        }
+    }
+
+    private void printInStream(Collection<Student> students, int offSet, int limit) {
+        System.out.printf("Current thread: %s%n", Thread.currentThread().getName());
+        students.stream()
+                .skip(offSet)
+                .limit(limit)
+                .forEach(System.out::println);
     }
 
 }
