@@ -11,6 +11,7 @@ import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repository.FacultyRepository;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -158,4 +159,25 @@ class FacultyServiceImplTest {
         assertTrue(result.contains(faculty1));
         assertTrue(result.contains(faculty3));
     }
+
+    @Test
+    @DisplayName("Тест метода поиска самого длинного названия факультета")
+    void findFacultyLongestName() {
+        //setup
+        Faculty notExpectedFaculty1 = new Faculty("testName1", "Red");
+        Faculty expectedFaculty = new Faculty("longTestName2", "Blue");
+        Faculty notExpectedFaculty2 = new Faculty("testName3", "Red");
+
+        List<Faculty> allFaculties = Arrays.asList(notExpectedFaculty1, notExpectedFaculty2, expectedFaculty);
+
+        when(facultyRepository.findAll()).thenReturn(allFaculties);
+
+        //test
+        String result = out.findFacultyLongestName();
+
+        //check
+        assertTrue(Optional.of(expectedFaculty.getName()).get().equals(result));
+
+    }
+
 }
