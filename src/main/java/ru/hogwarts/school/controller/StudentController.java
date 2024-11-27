@@ -84,6 +84,16 @@ public class StudentController {
         return studentService.getLastFiveStudents();
     }
 
+    @GetMapping("/get/print-parallel")
+    public void printParallel(){
+        studentService.printParallel();
+    }
+
+    @GetMapping("/get/print-synchronized")
+    public void printParallelSynchronized(){
+        studentService.printParallelSynchronized();
+    }
+  
     @GetMapping("/get/all-students-name-starts-with-A")
     public List<Student> findAllNameStartsWithA() {
         return studentService.findAllNameStartsWithA();
