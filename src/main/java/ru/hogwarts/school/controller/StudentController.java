@@ -75,7 +75,7 @@ public class StudentController {
     }
 
     @GetMapping("/get/avg-student-age")
-    public Double getAvgStudentAge() {
+    public double getAvgStudentAge() {
         return studentService.getAvgStudentAge();
     }
 
@@ -90,8 +90,18 @@ public class StudentController {
     }
 
     @GetMapping("/get/print-synchronized")
-    void printParallelSynchronized(){
+    public void printParallelSynchronized(){
         studentService.printParallelSynchronized();
+    }
+  
+    @GetMapping("/get/all-students-name-starts-with-A")
+    public List<Student> findAllNameStartsWithA() {
+        return studentService.findAllNameStartsWithA();
+    }
+
+    @GetMapping("/get/avg-all-student-age-stream")
+    public double getAllAvgStudentAgeStream() {
+        return studentService.getAllAvgStudentAgeStream();
     }
 
 }

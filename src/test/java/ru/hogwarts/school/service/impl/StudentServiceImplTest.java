@@ -1,5 +1,6 @@
 package ru.hogwarts.school.service.impl;
 
+import org.checkerframework.checker.units.qual.A;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -177,11 +178,11 @@ class StudentServiceImplTest {
 
     @Test
     void testGetLastFiveStudents() {
-        Student student1 = new Student("test1",20);
-        Student student2 = new Student("test2",20);
-        Student student3 = new Student("test3",20);
-        Student student4 = new Student("test4",20);
-        Student student5 = new Student("test5",20);
+        Student student1 = new Student("test1", 20);
+        Student student2 = new Student("test2", 20);
+        Student student3 = new Student("test3", 20);
+        Student student4 = new Student("test4", 20);
+        Student student5 = new Student("test5", 20);
         List<Student> lastFiveStudents = Arrays.asList(student1, student2, student3, student4, student5);
 
         when(studentRepository.getLastFiveStudents()).thenReturn(lastFiveStudents);
@@ -189,6 +190,36 @@ class StudentServiceImplTest {
         List<Student> result = studentService.getLastFiveStudents();
         assertEquals(5, result.size());
         assertEquals(lastFiveStudents, result);
+    }
+
+    @Test
+    void testFindAllNameStartsWithA() {
+        Student expectedStudent1 = new Student("aTest1", 20);
+        Student expectedStudent2 = new Student("aTest2", 20);
+        Student notExpectedStudent = new Student("test3", 20);
+
+        List<Student> allStudents = Arrays.asList(expectedStudent1, expectedStudent2, notExpectedStudent);
+
+        when(studentRepository.findAll()).thenReturn(allStudents);
+
+        List<Student> result = studentService.findAllNameStartsWithA();
+
+        assertTrue(result.contains(expectedStudent1) && result.contains(expectedStudent2)
+                && !result.contains(notExpectedStudent));
+    }
+
+    @Test
+    void testGetAllAvgStudentAgeStream(){
+        Student student1 = new Student("test1", 20);
+        Student student2 = new Student("test2", 20);
+
+        List<Student> allStudents = Arrays.asList(student1,student2);
+
+        when(studentRepository.findAll()).thenReturn(allStudents);
+
+        double result = studentService.getAllAvgStudentAgeStream();
+
+        assertEquals(result, 20.0);
     }
 
 }
