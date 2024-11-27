@@ -188,4 +188,29 @@ class StudentControllerTest {
                 .andExpect(jsonPath("$.length()", is(5)));
     }
 
+    @Test
+    public void findAllNameStartsWithA() throws Exception{
+        Student student1 = new Student("Astudent1", 20);
+        Student student2 = new Student("Astudent2", 20);
+        student1.setId(1L);
+        student2.setId(2L);
+        List<Student> studentList = List.of(student1, student2);
+
+        when(studentService.findAllNameStartsWithA()).thenReturn(studentList);
+
+        mvc.perform(get("/student/get/all-students-name-starts-with-A"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[0].name").value("Astudent1"));
+    }
+
+    @Test
+    public void getAllAvgStudentAgeStream() throws Exception{
+        when(studentService.getAllAvgStudentAgeStream()).thenReturn(18.75);
+
+        mvc.perform(get("/student/get/avg-all-student-age-stream"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", is(18.75)));
+    }
+
 }

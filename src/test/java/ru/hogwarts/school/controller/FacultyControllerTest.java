@@ -151,4 +151,15 @@ class FacultyControllerTest {
                 .andExpect(jsonPath("$[0].age").value(22));
     }
 
+    @Test
+    public void findFacultyLongestName() throws Exception{
+        Faculty longFaculty = new Faculty("longName", "testColor");
+
+        when(facultyService.findFacultyLongestName()).thenReturn(longFaculty.getName());
+
+        mvc.perform(get("/faculty/get/longest-name"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("longName"));
+    }
+
 }

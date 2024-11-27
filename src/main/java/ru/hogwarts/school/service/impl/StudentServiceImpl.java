@@ -101,4 +101,19 @@ public class StudentServiceImpl implements ru.hogwarts.school.service.StudentSer
         return studentRepository.getLastFiveStudents();
     }
 
+    @Override
+    public List<Student> findAllNameStartsWithA(){
+        return studentRepository.findAll().stream()
+                .filter(s -> s.getName().toUpperCase().startsWith("A"))
+                .toList();
+    }
+
+    @Override
+    public double getAllAvgStudentAgeStream(){
+        return studentRepository.findAll().stream()
+                .mapToDouble(Student::getAge)
+                .average()
+                .orElse(0);
+    }
+
 }

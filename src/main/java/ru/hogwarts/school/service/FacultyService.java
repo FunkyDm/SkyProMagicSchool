@@ -20,4 +20,6 @@ public interface FacultyService {
 
     List<Student> findByFacultyId(long id);
 
+    String findFacultyLongestName();
+
 }
